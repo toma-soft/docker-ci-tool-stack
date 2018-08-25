@@ -13,16 +13,18 @@ services:
     build: ./docker-nexus3
     restart: always
     ports:
-      - "18081:8081"
+      - "11000:8081"
     networks:
       - prodnetwork
     volumes:
       - nexus-data:/nexus-data
+    environment:
+      - NEXUS_CONTEXT=nexus
   jenkins:
     build: ./jenkins
     restart: always
     ports:
-      - "18080:8080"
+      - "10000:8080"
     networks:
       - prodnetwork
     volumes:
@@ -36,6 +38,7 @@ services:
       - NEXUS_PORT=8081
       - SONAR_PORT=9000
       - SONAR_DB_PORT=5432
+      - JENKINS_OPTS=--prefix=/jenkins  
   sonardb:
     networks:
       - prodnetwork
@@ -49,9 +52,10 @@ services:
   sonar:
     image: sonarqube
     restart: always
+    command: -Dsonar.web.context=/sonar
     ports:
-     - "19000:9000"
-     - "19092:9092"
+     - "12000:9000"
+     - "9092:9092"
     networks:
       - prodnetwork
     depends_on:
