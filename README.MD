@@ -22,7 +22,5 @@ Create a data structure on the file system. You can create also a symbolic link,
 ### Read the article
 
 Go the article of mine http://tomasoftware.com/resources/pdfs/Docker_Compose_EN_v1.0.pdf which I created to describe the Docker Compose technology.
-The main idea of the article and this fork, is to bring the simplest working example out-of-the-box. I found many examples on the Net, which did not work as expected wihtout additional/hidden tunning. So, I hope that you can use my example and say, that it does work immeidielty after preconfiguration of the filesystem.
-
-
+The main idea of the article and this fork, is to bring the simplest working example out-of-the-box. I found many examples on the Net, which did not work as expected wihtout additional/hidden tunning. So, I hope that you can use my example and say, that it does work immediately after preconfiguration of the filesystem.
 
