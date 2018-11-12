@@ -5,19 +5,53 @@ networks:
     driver: bridge
 
 volumes:
-  nexus-data:
-  jenkins-data:
+  jenkins_data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /data/jenkins_data
+  nexus_data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /data/nexus_data
+  sonardata_data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /data/sonar_data/data
+  sonarconf_data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /data/sonar_data/conf
+  sonarlogs_data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /data/sonar_data/logs
+  sonardb_data:
+     driver: local
+     driver_opts:
+       o: bind
+       type: none
+       device: /data/sonardb_data
 
 services:
   nexus:
-    build: ./docker-nexus3
+    build: ./nexus
     restart: always
     ports:
       - "11000:8081"
     networks:
       - prodnetwork
     volumes:
-      - nexus-data:/nexus-data
+      - nexus_data:/nexus-data
     environment:
       - NEXUS_CONTEXT=nexus
   jenkins:
@@ -28,9 +62,7 @@ services:
     networks:
       - prodnetwork
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /usr/bin/docker:/usr/bin/docker
-      - jenkins-data:/var/lib/jenkins/
+      - jenkins_data:/var/jenkins_home/
     depends_on:
       - nexus
       - sonar
@@ -46,6 +78,8 @@ services:
     image: postgres:9.6
     ports:
       - "5432:5432"
+    volumes:
+      - sonardb_data:/var/lib/postgresql/data
     environment:
      - POSTGRES_USER=sonar
      - POSTGRES_PASSWORD=sonar
@@ -60,6 +94,10 @@ services:
       - prodnetwork
     depends_on:
       - sonardb
+    volumes:
+      - sonarconf_data:/opt/sonarqube/conf
+      - sonarlogs_data:/opt/sonarqube/logs
+      - sonardata_data:/opt/sonarqube/data
     environment:
      - SONARQUBE_JDBC_URL=jdbc:postgresql://sonardb:5432/sonar
      - SONARQUBE_JDBC_USERNAME=sonar
