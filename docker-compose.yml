@@ -1,8 +1,4 @@
-version: '3'
-
-networks:
-  prodnetwork:
-    driver: bridge
+version: '3.4'
 
 volumes:
   jenkins_data:
@@ -45,11 +41,11 @@ volumes:
 services:
   nexus:
     build: ./nexus
+    #image: sonatype/nexus3
     restart: always
-    ports:
-      - "11000:8081"
-    networks:
-      - prodnetwork
+    #ports:
+    #  - "11000:8081"
+    network_mode: "host"
     volumes:
       - nexus_data:/nexus-data
     environment:
@@ -57,10 +53,9 @@ services:
   jenkins:
     build: ./jenkins
     restart: always
-    ports:
-      - "10000:8080"
-    networks:
-      - prodnetwork
+    #ports:
+    #  - "10000:8080"
+    network_mode: "host"
     volumes:
       - jenkins_data:/var/jenkins_home/
     depends_on:
@@ -70,10 +65,9 @@ services:
       - NEXUS_PORT=8081
       - SONAR_PORT=9000
       - SONAR_DB_PORT=5432
-      - JENKINS_OPTS=--prefix=/jenkins  
+      - JENKINS_OPTS=--prefix=/jenkins --httpPort=10000
   sonardb:
-    networks:
-      - prodnetwork
+    network_mode: "host"
     restart: always
     image: postgres:9.6
     ports:
@@ -90,8 +84,7 @@ services:
     ports:
      - "12000:9000"
      - "9092:9092"
-    networks:
-      - prodnetwork
+    network_mode: "host"
     depends_on:
       - sonardb
     volumes:
@@ -103,23 +96,3 @@ services:
      - SONARQUBE_JDBC_USERNAME=sonar
      - SONARQUBE_JDBC_PASSWORD=sonar
 
-##########################################################################################
-# DISABLED: GitLab takes too much memory and CPU. Demo uses GitHub repositories instead.
-#
-#  gitlab:
-#    image: gitlab/gitlab-ce:latest
-#    restart: always
-#    networks:
-#      - prodnetwork
-#    environment:
-#      GITLAB_OMNIBUS_CONFIG: |
-#        # external_url 'https://gitlab.example.com'
-#        # Add any other gitlab.rb configuration here, each on its own line
-#    ports:
-#      - "10080:80"
-#      - "10443:443"
-#      - "10022:22"
-#    volumes:
-#      - /opt/gitlab/config:/etc/gitlab
-#      - /opt/gitlab/logs:/var/log/gitlab
-#      - /opt/gitlab/data:/var/opt/gitlab
